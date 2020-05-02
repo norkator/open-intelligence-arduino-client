@@ -48,7 +48,8 @@ const size_t MAX_CONTENT_SIZE = 124; // Must be incremented if http response com
 // --------------------------------------------------------------------------------
 // Variables
 
-String detectionCount = "";
+String detectionsCount = "";
+String personsCount = "";
 String lastLp = "";
 
 // --------------------------------------------------------------------------------
@@ -211,19 +212,23 @@ void parseResponseData(char* content) {
   }
 
   String oldLp = lastLp;
-  detectionCount = output["detection_count"].as<String>();
+  String oldPersonsCount = personsCount;
+  detectionsCount = output["detections_count"].as<String>();
+  personsCount = output["persons_count"].as<String>();
   lastLp = output["last_lp"].as<String>();
 
   lcd.clear();
   lcd.setCursor(0, 0);
-  lcd.print("DetCnt: " + detectionCount);
+  lcd.print("DetCnt: " + detectionsCount);
   lcd.setCursor(0, 1);
   lcd.print("LstLP: " + lastLp);
 
   if (oldLp != lastLp) {
-    digitalWrite(buzzerPin, LOW); // BUZZ ON
-    delay(500);
-    digitalWrite(buzzerPin, HIGH); // BUZZ OFF
+    buzz(500);
+  }
+
+  if (oldPersonsCount != personsCount) {
+    buzz(250);
   }
 
 }
@@ -238,6 +243,12 @@ void disconnect() {
 
 // --------------------------------------------------------------------------------
 
+
+void buzz(int millis) {
+  digitalWrite(buzzerPin, LOW); // BUZZ ON
+  delay(millis);
+  digitalWrite(buzzerPin, HIGH); // BUZZ OFF
+}
 
 
 // --------------------------------------------------------------------------------------------------------------------------
