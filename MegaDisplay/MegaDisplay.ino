@@ -32,11 +32,16 @@ const int lcd_D7_Pin    = 7; // D7
 // R/W pin ground, VSS pin ground, VCC pin 5V
 LiquidCrystal lcd(lcd_RS_Pin, lcd_E_Pin, lcd_D4_Pin, lcd_D5_Pin, lcd_D6_Pin, lcd_D7_Pin);
 const int buzzerPin     = 8;
+const int relay1Pin     = 24;
+const int relay2Pin     = 25;
+const int relay3Pin     = 26;
+const int relay4Pin     = 27;
 
 // --------------------------------------------------------------------------------
 
 // ## ETHERNET CONFIG ##
 EthernetClient client;
+EthernetServer ethernetServer(80); // Port 80
 byte mac[] = { 0xFA, 0xF4, 0x9A, 0xC7, 0xC6, 0xC2 }; // Mac address for ethernet nic
 // IPAddress ip(192, 168, 1, 5); // we are using dhcp, no static ip needed
 const char* server  = serverAddress;
@@ -51,6 +56,9 @@ const size_t MAX_CONTENT_SIZE = 124; // Must be incremented if http response com
 String detectionsCount = "";
 String personsCount = "";
 String lastLp = "";
+String relay1State = "Off";
+char linebuf[80];
+int charcount=0;
 
 // --------------------------------------------------------------------------------
 
@@ -68,6 +76,16 @@ void setup() {
   // init buzzer
   pinMode(buzzerPin, OUTPUT);
   digitalWrite(buzzerPin, HIGH); // Buzzer off
+
+  // init relays
+  pinMode(relay1Pin, OUTPUT);
+  digitalWrite(relay1Pin, HIGH);
+  pinMode(relay2Pin, OUTPUT);
+  digitalWrite(relay2Pin, HIGH);
+  pinMode(relay3Pin, OUTPUT);
+  digitalWrite(relay3Pin, HIGH);
+  pinMode(relay4Pin, OUTPUT);
+  digitalWrite(relay4Pin, HIGH);
 
   // init lcd screen
   lcd.begin(16, 2); // Lcd columns and rows count
@@ -90,11 +108,83 @@ void setup() {
   delay(5 * 1000);
 }
 
+
+// Display dashboard page with on/off button for relay
+// It also print Temperature in C and F
+void dashboardPage(EthernetClient &client) {
+  client.println("<!DOCTYPE HTML><html><head>");
+  client.println("<meta name=\"viewport\" content=\"width=device-width, initial-scale=1\"></head><body>");                                                             
+  client.println("<h3>Arduino Web Server - <a href=\"/\">Refresh</a></h3>");
+  // Generates buttons to control the relay
+  client.println("<h4>Relay 1 - State: " + relay1State + "</h4>");
+  // If relay is off, it shows the button to turn the output on          
+  if(relay1State == "Off"){
+    client.println("<a href=\"/relay1on\"><button>ON</button></a>");
+  }
+  // If relay is on, it shows the button to turn the output off         
+  else if(relay1State == "On"){
+    client.println("<a href=\"/relay1off\"><button>OFF</button></a>");                                                                    
+  }
+  client.println("</body></html>"); 
+}
+
+void webPageListenLoop() {
+    // listen for incoming clients
+  EthernetClient client = ethernetServer.available();
+  if (client) {
+    Serial.println("new client");
+    memset(linebuf,0,sizeof(linebuf));
+    charcount=0;
+    // an http request ends with a blank line
+    boolean currentLineIsBlank = true;
+    while (client.connected()) {
+      if (client.available()) {
+       char c = client.read();
+       //read char by char HTTP request
+        linebuf[charcount]=c;
+        if (charcount<sizeof(linebuf)-1) charcount++;
+        // if you've gotten to the end of the line (received a newline
+        // character) and the line is blank, the http request has ended,
+        // so you can send a reply
+        if (c == '\n' && currentLineIsBlank) {
+          dashboardPage(client);
+          break;
+        }
+        if (c == '\n') {
+          if (strstr(linebuf,"GET /relay1off") > 0){
+            digitalWrite(relay1Pin, HIGH);
+            relay1State = "Off";
+          }
+          else if (strstr(linebuf,"GET /relay1on") > 0){
+            digitalWrite(relay1Pin, LOW);
+            relay1State = "On";
+          }
+          // you're starting a new line
+          currentLineIsBlank = true;
+          memset(linebuf,0,sizeof(linebuf));
+          charcount=0;          
+        } 
+        else if (c != '\r') {
+          // you've gotten a character on the current line
+          currentLineIsBlank = false;
+        }
+      }
+    }
+    // give the web browser time to receive the data
+    delay(1);
+    // close the connection:
+    client.stop();
+    Serial.println("client disonnected");
+  }
+}
+
+
 // --------------------------------------------------------------------------------
 
 // LOOP
 void loop() {
   runner.execute(); // Runner is responsible for all tasks
+  webPageListenLoop();
 }
 
 // --------------------------------------------------------------------------------
