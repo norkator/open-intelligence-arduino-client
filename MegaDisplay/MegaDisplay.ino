@@ -124,19 +124,34 @@ void setup() {
 // Display dashboard page with on/off button for relay
 // It also print Temperature in C and F
 void dashboardPage(EthernetClient &client) {
-  client.println("<!DOCTYPE HTML><html><head>");
-  client.println("<meta name=\"viewport\" content=\"width=device-width, initial-scale=1\"></head><body>");                                                             
-  client.println("<h3>Arduino Web Server - <a href=\"/\">Refresh</a></h3>");
-  // Generates buttons to control the relay
-  client.println("<h4>Relay 1 - State: " + relay1State + "</h4>");
-  // If relay is off, it shows the button to turn the output on          
+
+  client.println("<!DOCTYPE HTML><html lang=\"en\"><head>");
+  client.println("<meta charset=\"UTF-8\"><title>OI-Arduino Server</title><meta name=\"viewport\" content=\"width=device-width, initial-scale=1\">");
+  client.println("<style>table {font-family: arial, sans-serif;border-collapse: collapse;display: inline-block;float: left;}  td, th {border: 1px solid #dddddd;text-align: left;padding: 5px;} button { width: 100%;}</style>");
+  client.println("</head><body>");
+  client.println("<h3><a href=\"/\">Refresh</a></h3>");
+
+  // Blower control table
+  client.println("<table><tr><th>Blower relay</th></tr><tr><td>");
+  if(relay1State == "Off"){
+    client.println("<div style=\"background-color: red; width: 100%; height: 15px;\"></div>");
+  } 
+  else if(relay1State == "On"){
+    client.println("<div style=\"background-color: green; width: 100%; height: 15px;\"></div>");                                                                    
+  }
+  client.println("</td></tr><tr><td>");
   if(relay1State == "Off"){
     client.println("<a href=\"/relay1on\"><button>ON</button></a>");
-  }
-  // If relay is on, it shows the button to turn the output off         
+  } 
   else if(relay1State == "On"){
     client.println("<a href=\"/relay1off\"><button>OFF</button></a>");                                                                    
   }
+  client.println("</td></tr></table>");
+
+  // DHT22 tables
+  client.println("<table><tr><th>DHT22-1 (Ceiling)</th></tr><tr><td>" + (String)dht22_1Temperature  + "°C</td></tr><tr><td>" + (String)dht22_1Humidity + "rH</td></tr></table>");
+  client.println("<table><tr><th>DHT22-2 (Floor)</th></tr><tr><td>" + (String)dht22_2Temperature  + "°C</td></tr><tr><td>" + (String)dht22_2Humidity + "rH</td></tr></table>");
+   
   client.println("</body></html>"); 
 }
 
