@@ -1,0 +1,70 @@
+<!DOCTYPE HTML>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>OI-Arduino Server</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <style>
+        table {
+            font-family: arial, sans-serif;
+            border-collapse: collapse;
+            display: inline-block;
+            float: left;
+        }
+        td, th {
+            border: 1px solid #dddddd;
+            text-align: left;
+            padding: 5px;
+        }
+        button {
+            width: 100%;
+        }
+    </style>
+</head>
+<body>
+<h3><a href="/">Refresh</a></h3>
+
+<table>
+    <tr>
+        <th>Blower relay</th>
+    </tr>
+    <tr>
+        <td>
+            <div style="background-color: green; width: 100%; height: 15px;"></div>
+        </td>
+    </tr>
+    <tr>
+        <td>
+            <a href="/relay1on">
+                <button>ON</button>
+            </a>
+        </td>
+    </tr>
+</table>
+
+<table>
+    <tr>
+        <th>DHT22-1 (Ceiling)</th>
+    </tr>
+    <tr>
+        <td>22.2 C</td>
+    </tr>
+    <tr>
+        <td>46 %rH</td>
+    </tr>
+</table>
+
+<table>
+    <tr>
+        <th>DHT22-2 (Floor)</th>
+    </tr>
+    <tr>
+        <td>22.2 C</td>
+    </tr>
+    <tr>
+        <td>46 %rH</td>
+    </tr>
+</table>
+
+</body>
+</html>
