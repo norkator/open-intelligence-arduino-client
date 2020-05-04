@@ -1,7 +1,7 @@
 # Open-Intelligence-Arduino-Client
 
 <p align="start">
-  <img src="https://github.com/norkator/Open-Intelligence-Arduino-Client/tree/master/MegaDisplay/page1.png" alt="page">
+  <img src="https://github.com/norkator/Open-Intelligence-Arduino-Client/blob/master/MegaDisplay/page1.PNG" alt="page">
 </p>
 
 Small Arduino information display unit for Open Intelligence project. 
