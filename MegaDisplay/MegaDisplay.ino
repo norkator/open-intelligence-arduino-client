@@ -13,6 +13,7 @@
 #include <EthernetUdp.h>
 #include <TaskScheduler.h>
 #include <LiquidCrystal.h>
+#include <dht.h>
 
 // --------------------------------------------------------------------------------
 // ## BASIC CONFIGURATION ##
@@ -32,10 +33,12 @@ const int lcd_D7_Pin    = 7; // D7
 // R/W pin ground, VSS pin ground, VCC pin 5V
 LiquidCrystal lcd(lcd_RS_Pin, lcd_E_Pin, lcd_D4_Pin, lcd_D5_Pin, lcd_D6_Pin, lcd_D7_Pin);
 const int buzzerPin     = 8;
-const int relay1Pin     = 24;
+const int relay1Pin     = 24; // "Tunnel" air blower
 const int relay2Pin     = 25;
 const int relay3Pin     = 26;
 const int relay4Pin     = 27;
+#define DHT22_1_PIN       28
+#define DHT22_2_PIN       29
 
 // --------------------------------------------------------------------------------
 
@@ -53,10 +56,16 @@ const size_t MAX_CONTENT_SIZE = 124; // Must be incremented if http response com
 // --------------------------------------------------------------------------------
 // Variables
 
+dht DHT;
 String detectionsCount = "";
 String personsCount = "";
 String lastLp = "";
 String relay1State = "Off";
+double dht22_1Temperature = 0.0;
+int dht22_1Humidity = 0;
+double dht22_2Temperature = 0.0;
+int dht22_2Humidity = 0;
+
 char linebuf[80];
 int charcount=0;
 
@@ -66,6 +75,7 @@ int charcount=0;
 // Task scheduler config
 Scheduler runner;
 Task t1(30 * 1000, TASK_FOREVER, &httpCallback); int httpSkip = 0; // Skip some
+Task t2(40 * 1000, TASK_FOREVER, &dhtRead);
 
 // ----------------------------------------------------------------------------------------------------------------------------------------------
 
@@ -103,7 +113,9 @@ void setup() {
   // init task scheduler
   runner.init();
   runner.addTask(t1);
+  runner.addTask(t2);
   t1.enable();
+  t2.enable();
 
   delay(5 * 1000);
 }
@@ -342,11 +354,36 @@ void buzz(int millis) {
 
 
 // --------------------------------------------------------------------------------------------------------------------------
+// -------------------------------------A L L - S E N S O R - R E A D I N G - T A S K S -------------------------------------
+// --------------------------------------------------------------------------------------------------------------------------
+
+// Read DHT temperature and humidity
+void dhtRead() {
+  int chk = DHT.read22(DHT22_1_PIN);  
+  dht22_1Temperature = DHT.temperature;
+  dht22_1Humidity = (DHT.humidity * 2);
+  Serial.print("Temperature 1 val : ");
+  Serial.print(dht22_1Temperature);
+  Serial.println("°C");
+  Serial.print("Humidity 1 val : ");
+  Serial.print(dht22_1Humidity);
+  Serial.println("rH");
+
+  chk = DHT.read22(DHT22_2_PIN);  
+  dht22_2Temperature = DHT.temperature;
+  dht22_2Humidity = (DHT.humidity * 2);
+  Serial.print("Temperature 2 val : ");
+  Serial.print(dht22_2Temperature);
+  Serial.println("°C");
+  Serial.print("Humidity 2 val : ");
+  Serial.print(dht22_2Humidity);
+  Serial.println("rH");
+}
+
+// --------------------------------------------------------------------------------------------------------------------------
 // -----------------------------P L A C E - H O L D E R - F O R - C O N T R O L  - T A S K S --------------------------------
 // --------------------------------------------------------------------------------------------------------------------------
 
-
-
-
+/* Code here */
 
 // --------------------------------------------------------------------------------
