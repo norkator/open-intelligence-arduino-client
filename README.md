@@ -14,6 +14,9 @@ for base html arduino relay control and modified/styled it to show also two DHT2
 I will use relay to control "tunnel" air blower to remove warm air fast from server room. Two DHT22 will be placed
 on ceiling and other on floor to see room height temperature difference. 
 
+###### Arduino IDE
+I use old 1.6.2 IDE, https://www.arduino.cc/download_handler.php?f=/arduino-1.6.2-windows.exe
+Most likely won't compile with newer ones. I have not been following Arduino ecosystem development.
 
 ###### Hardware requirements
 * Arduino. I use `Mega 2560`
