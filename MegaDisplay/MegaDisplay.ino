@@ -61,6 +61,9 @@ String detectionsCount = "";
 String personsCount = "";
 String lastLp = "";
 String relay1State = "Off";
+String relay2State = "Off";
+String relay3State = "Off";
+String relay4State = "Off";
 double dht22_1Temperature = 0.0;
 int dht22_1Humidity = 0;
 double dht22_2Temperature = 0.0;
@@ -112,9 +115,9 @@ void setup() {
   
   // init task scheduler
   runner.init();
-  runner.addTask(t1);
+  // runner.addTask(t1);
   runner.addTask(t2);
-  t1.enable();
+  // t1.enable();
   t2.enable();
 
   delay(5 * 1000);
@@ -131,7 +134,7 @@ void dashboardPage(EthernetClient &client) {
   client.println("</head><body>");
   client.println("<h3><a href=\"/\">Refresh</a></h3>");
 
-  // Blower control table
+  // Blower control table | RELAY 1
   client.println("<table><tr><th>Blower relay</th></tr><tr><td>");
   if(relay1State == "Off"){
     client.println("<div style=\"background-color: red; width: 100%; height: 15px;\"></div>");
@@ -147,6 +150,61 @@ void dashboardPage(EthernetClient &client) {
     client.println("<a href=\"/relay1off\"><button>OFF</button></a>");                                                                    
   }
   client.println("</td></tr></table>");
+  
+  
+  // RELAY 2
+  client.println("<table><tr><th>Relay 2</th></tr><tr><td>");
+  if(relay2State == "Off"){
+    client.println("<div style=\"background-color: red; width: 100%; height: 15px;\"></div>");
+  } 
+  else if(relay2State == "On"){
+    client.println("<div style=\"background-color: green; width: 100%; height: 15px;\"></div>");                                                                    
+  }
+  client.println("</td></tr><tr><td>");
+  if(relay2State == "Off"){
+    client.println("<a href=\"/relay2on\"><button>ON</button></a>");
+  } 
+  else if(relay2State == "On"){
+    client.println("<a href=\"/relay2off\"><button>OFF</button></a>");                                                                    
+  }
+  client.println("</td></tr></table>");
+
+
+  // RELAY 3
+  client.println("<table><tr><th>Relay 3</th></tr><tr><td>");
+  if(relay3State == "Off"){
+    client.println("<div style=\"background-color: red; width: 100%; height: 15px;\"></div>");
+  } 
+  else if(relay3State == "On"){
+    client.println("<div style=\"background-color: green; width: 100%; height: 15px;\"></div>");                                                                    
+  }
+  client.println("</td></tr><tr><td>");
+  if(relay3State == "Off"){
+    client.println("<a href=\"/relay3on\"><button>ON</button></a>");
+  } 
+  else if(relay3State == "On"){
+    client.println("<a href=\"/relay3off\"><button>OFF</button></a>");                                                                    
+  }
+  client.println("</td></tr></table>");
+
+
+  // RELAY 4
+  client.println("<table><tr><th>Relay 4</th></tr><tr><td>");
+  if(relay4State == "Off"){
+    client.println("<div style=\"background-color: red; width: 100%; height: 15px;\"></div>");
+  } 
+  else if(relay4State == "On"){
+    client.println("<div style=\"background-color: green; width: 100%; height: 15px;\"></div>");                                                                    
+  }
+  client.println("</td></tr><tr><td>");
+  if(relay4State == "Off"){
+    client.println("<a href=\"/relay4on\"><button>ON</button></a>");
+  } 
+  else if(relay4State == "On"){
+    client.println("<a href=\"/relay4off\"><button>OFF</button></a>");                                                                    
+  }
+  client.println("</td></tr></table>");
+
 
   // DHT22 tables
   client.println("<table><tr><th>DHT22-1 (Ceiling)</th></tr><tr><td>" + (String)dht22_1Temperature  + "°C</td></tr><tr><td>" + (String)dht22_1Humidity + "rH</td></tr></table>");
@@ -186,6 +244,34 @@ void webPageListenLoop() {
             digitalWrite(relay1Pin, LOW);
             relay1State = "On";
           }
+          
+          if (strstr(linebuf,"GET /relay2off") > 0){
+            digitalWrite(relay2Pin, HIGH);
+            relay2State = "Off";
+          }
+          else if (strstr(linebuf,"GET /relay2on") > 0){
+            digitalWrite(relay2Pin, LOW);
+            relay2State = "On";
+          }
+          
+          if (strstr(linebuf,"GET /relay3off") > 0){
+            digitalWrite(relay3Pin, HIGH);
+            relay3State = "Off";
+          }
+          else if (strstr(linebuf,"GET /relay3on") > 0){
+            digitalWrite(relay3Pin, LOW);
+            relay3State = "On";
+          }
+ 
+          if (strstr(linebuf,"GET /relay4off") > 0){
+            digitalWrite(relay4Pin, HIGH);
+            relay4State = "Off";
+          }
+          else if (strstr(linebuf,"GET /relay4on") > 0){
+            digitalWrite(relay4Pin, LOW);
+            relay4State = "On";
+          }
+          
           // you're starting a new line
           currentLineIsBlank = true;
           memset(linebuf,0,sizeof(linebuf));
