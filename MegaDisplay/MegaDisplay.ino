@@ -78,7 +78,7 @@ int charcount=0;
 // Task scheduler config
 Scheduler runner;
 Task t1(30 * 1000, TASK_FOREVER, &httpCallback); int httpSkip = 0; // Skip some
-Task t2(40 * 1000, TASK_FOREVER, &dhtRead);
+Task t2(30 * 1000, TASK_FOREVER, &dhtRead);
 
 // ----------------------------------------------------------------------------------------------------------------------------------------------
 
